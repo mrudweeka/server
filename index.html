@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Temporary Maintenance — We'll Be Back Soon</title>
+<meta name="robots" content="noindex, nofollow" />
+<style>
+  /* ============ DESIGN TOKENS ============ */
+  :root {
+    --bg:         #f4f6f9;
+    --bg-accent:  #e9edf3;
+    --card:       #ffffff;
+    --ink:        #1f2937;
+    --ink-soft:   #5b6472;
+    --ink-faint:  #8b93a1;
+    --brand:      #2563eb;
+    --brand-soft: #eff4ff;
+    --brand-ring: rgba(37, 99, 235, .28);
+    --ok:         #0e9f6e;
+    --ok-soft:    #e6f7f0;
+    --line:       #e4e8ee;
+    --shadow:     0 24px 60px -18px rgba(30, 41, 59, .22),
+                  0 4px 14px -6px rgba(30, 41, 59, .10);
+    --radius:     18px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            "Helvetica Neue", Arial, sans-serif;
+  }
+
+  /* ============ RESET / BASE ============ */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: var(--font);
+    background:
+      radial-gradient(1200px 600px at 15% -10%, var(--bg-accent) 0%, transparent 60%),
+      radial-gradient(1000px 500px at 110% 110%, var(--bg-accent) 0%, transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+  }
+
+  /* ============ PAGE HEADER / FOOTER ============ */
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 20px clamp(20px, 5vw, 48px);
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: clamp(1rem, 2.5vw, 1.125rem);
+    letter-spacing: -.01em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .brand-mark {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--brand), #7c3aed);
+    display: grid; place-items: center;
+    color: #fff; font-size: 15px; font-weight: 800;
+    flex: 0 0 auto;
+    box-shadow: 0 6px 14px -6px var(--brand-ring);
+  }
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .8125rem;
+    font-weight: 600;
+    color: #92400e;
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    padding: 7px 14px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #f59e0b;
+    animation: pulse 2s ease-in-out infinite;
+    flex: 0 0 auto;
+  }
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, .45); }
+    50%      { box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+  }
+
+  main {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding: 8px 20px 40px;
+  }
+
+  .hero { text-align: center; max-width: 560px; }
+  .hero-art {
+    width: clamp(120px, 28vw, 170px);
+    height: auto;
+    margin: 0 auto 8px;
+    display: block;
+  }
+  .hero h1 {
+    font-size: clamp(1.6rem, 5vw, 2.35rem);
+    line-height: 1.2;
+    letter-spacing: -.02em;
+    margin-bottom: 12px;
+  }
+  .hero p.lede {
+    color: var(--ink-soft);
+    font-size: clamp(.98rem, 2.6vw, 1.075rem);
+    max-width: 46ch;
+    margin: 0 auto;
+  }
+
+  /* ============ MODAL (the pop-up) ============ */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, .55);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    z-index: 100;
+    opacity: 0;
+    animation: fadeIn .45s ease .25s forwards;
+  }
+  @keyframes fadeIn { to { opacity: 1; } }
+
+  .modal {
+    background: var(--card);
+    width: min(480px, 100%);
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: clamp(24px, 5vw, 36px);
+    text-align: center;
+    transform: translateY(14px) scale(.97);
+    animation: rise .5s cubic-bezier(.2, .9, .3, 1.2) .35s forwards;
+    outline: none;
+  }
+  @keyframes rise { to { transform: translateY(0) scale(1); } }
+
+  .modal-icon {
+    width: 64px; height: 64px;
+    margin: 0 auto 18px;
+    border-radius: 50%;
+    background: var(--brand-soft);
+    display: grid; place-items: center;
+  }
+  .modal-icon svg { width: 30px; height: 30px; color: var(--brand); }
+
+  .modal h2 {
+    font-size: clamp(1.2rem, 4vw, 1.45rem);
+    letter-spacing: -.01em;
+    margin-bottom: 10px;
+  }
+  .modal p { color: var(--ink-soft); font-size: .95rem; }
+
+  .reassure {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+    background: var(--ok-soft);
+    border: 1px solid #bfe8d6;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin: 18px 0;
+  }
+  .reassure svg { width: 22px; height: 22px; color: var(--ok); flex: 0 0 auto; }
+  .reassure strong { color: #065f46; display: block; font-size: .9rem; }
+  .reassure span   { color: #2f6f58; font-size: .82rem; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    border: 0;
+    cursor: pointer;
+    font: 600 .95rem/1 var(--font);
+    border-radius: 12px;
+    padding: 14px 20px;
+    transition: background .2s, transform .12s, box-shadow .2s;
+  }
+  .btn:focus-visible { outline: 3px solid var(--brand-ring); outline-offset: 2px; }
+  .btn-primary {
+    background: var(--brand);
+    color: #fff;
+    box-shadow: 0 10px 22px -10px var(--brand-ring);
+  }
+  .btn-primary:hover  { background: #1d4fd7; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .recheck {
+    margin-top: 14px;
+    font-size: .8rem;
+    color: var(--ink-faint);
+  }
+
+  .modal-foot {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    font-size: .82rem;
+    color: var(--ink-faint);
+  }
+  .modal-foot a { color: var(--brand); font-weight: 600; text-decoration: none; }
+  .modal-foot a:hover { text-decoration: underline; }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 480px) {
+    .site-header { flex-direction: row; padding: 16px 20px; }
+    .status-pill { font-size: .72rem; padding: 6px 11px; }
+    .overlay { padding: 16px; }
+    .modal { max-height: calc(100dvh - 32px); }
+  }
+
+  /* ============ ACCESSIBILITY ============ */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .overlay, .modal { opacity: 1; transform: none; }
+  }
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px;
+    clip: rect(0 0 0 0); clip-path: inset(50%);
+    overflow: hidden; white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+  <header class="site-header">
+    <!-- ✏️ EDIT: your brand name / logo -->
+    <a class="brand" href="/" aria-label="YourBrand home">
+      <span class="brand-mark" aria-hidden="true">Y</span>
+      <span>YourBrand</span>
+    </a>
+    <span class="status-pill" role="status">
+      <span class="dot" aria-hidden="true"></span>
+      System status: Under maintenance
+    </span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <svg class="hero-art" viewBox="0 0 200 140" fill="none" aria-hidden="true">
+        <rect x="30" y="30" width="140" height="86" rx="10" fill="#fff" stroke="#dbe1ea" stroke-width="2.5"/>
+        <circle cx="46" cy="46" r="4" fill="#fca5a5"/>
+        <circle cx="60" cy="46" r="4" fill="#fcd34d"/>
+        <circle cx="74" cy="46" r="4" fill="#86efac"/>
+        <line x1="44" y1="66" x2="130" y2="66" stroke="#e4e8ee" stroke-width="6" stroke-linecap="round"/>
+        <line x1="44" y1="82" x2="110" y2="82" stroke="#e4e8ee" stroke-width="6" stroke-linecap="round"/>
+        <line x1="44" y1="98" x2="95" y2="98" stroke="#e4e8ee" stroke-width="6" stroke-linecap="round"/>
+        <path d="M148 96 L188 136 M188 96 L148 136" stroke="#f0b429" stroke-width="9" stroke-linecap="round"/>
+      </svg>
+      <h1>We&rsquo;ll be back shortly</h1>
+      <p class="lede">
+        Our servers are temporarily down for scheduled maintenance.
+        We&rsquo;re working to restore full service as quickly as possible.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer" style="text-align:center;padding:22px;color:var(--ink-faint);font-size:.8rem;">
+    &copy; <span id="year">2026</span> YourBrand. All rights reserved.
+  </footer>
+
+  <!-- ============ MODAL ============ -->
+  <div class="overlay" id="overlay">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="dlg-title" aria-describedby="dlg-desc" tabindex="-1" id="modal">
+      <div class="modal-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v6a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z"/>
+          <path d="M8 20h8M12 16v4M7.5 9.5 9.5 13h5l2-3.5"/>
+        </svg>
+      </div>
+
+      <h2 id="dlg-title">Server is down</h2>
+      <p id="dlg-desc">
+        We&rsquo;re currently experiencing a temporary outage.
+        We will be back at any time &mdash; please check the website regularly.
+        We apologize for the inconvenience.
+      </p>
+
+      <div class="reassure">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3 4.5 6v5c0 5 3.2 8.3 7.5 10 4.3-1.7 7.5-5 7.5-10V6z"/>
+          <path d="m9 12 2 2 4-4"/>
+        </svg>
+        <div>
+          <strong>Your funds are safe with us</strong>
+          <span>All balances and transactions remain fully secured.</span>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" id="retryBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-2.6-6.3M21 3v6h-6"/>
+        </svg>
+        <span id="retryLabel">Refresh &amp; Try Again</span>
+      </button>
+
+      <p class="recheck" id="recheckMsg">This page will automatically recheck every 60 seconds.</p>
+
+      <div class="modal-foot">
+        Need help? Contact support:
+        <!-- ✏️ EDIT: your support email and status page link -->
+        <a href="mailto:support@yourbrand.com">support@yourbrand.com</a>
+        &middot; <a href="https://status.yourbrand.com">Status page</a>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ===== CONFIG — edit these ===== */
+  var CONFIG = {
+    supportEmail:   "support@yourbrand.com",
+    autoRecheck:    true,   // set false to disable the 60s auto-reload
+    recheckSeconds: 60
+  };
+
+  var overlay   = document.getElementById("overlay");
+  var modal     = document.getElementById("modal");
+  var retryBtn  = document.getElementById("retryBtn");
+  var retryLbl  = document.getElementById("retryLabel");
+  var lastFocus = null;
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  /* --- Open modal on load, trap focus --- */
+  function openModal() {
+    lastFocus = document.activeElement;
+    overlay.style.display = "grid";
+    document.body.style.overflow = "hidden";
+    retryBtn.focus();
+  }
+
+  function closeModal() {
+    overlay.style.display = "none";
+    document.body.style.overflow = "";
+    if (lastFocus) lastFocus.focus();
+  }
+
+  /* Focus trap */
+  modal.addEventListener("keydown", function (e) {
+    if (e.key !== "Tab") return;
+    var focusables = modal.querySelectorAll("button, a[href]");
+    var first = focusables[0], last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+
+  /* Esc key: closes the pop-up, page stays in maintenance mode */
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && overlay.style.display !== "none") closeModal();
+  });
+
+  /* Click outside modal closes it too */
+  overlay.addEventListener("click", function (e) {
+    if (e.target === overlay) closeModal();
+  });
+
+  /* Manual retry */
+  retryBtn.addEventListener("click", function () {
+    retryBtn.disabled = true;
+    retryBtn.style.opacity = ".7";
+    retryLbl.textContent = "Rechecking…";
+    /* Point this at your real health endpoint if you have one */
+    setTimeout(function () { window.location.reload(); }, 800);
+  });
+
+  /* Gentle auto-recheck — reloads quietly if server is back */
+  if (CONFIG.autoRecheck) {
+    setTimeout(function () {
+      document.getElementById("recheckMsg").textContent =
+        "Still checking… the page will refresh automatically.";
+      window.location.reload();
+    }, CONFIG.recheckSeconds * 1000);
+  } else {
+    document.getElementById("recheckMsg").style.display = "none";
+  }
+
+  /* Show modal shortly after load so page paint isn't blocked */
+  setTimeout(openModal, 250);
+})();
+</script>
+</body>
+</html>
